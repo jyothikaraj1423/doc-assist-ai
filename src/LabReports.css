@@ -1,0 +1,81 @@
+.lab-reports-container {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(60,60,60,0.08);
+  padding: 2rem;
+  width: 100%;
+  max-width: 1000px;
+}
+.lab-reports-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+.lab-reports-header h2 {
+  margin: 0;
+  color: #2d3748;
+  font-size: 1.5rem;
+}
+.request-lab-btn {
+  background: #3182ce;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+.request-lab-btn:hover {
+  background: #2c5aa0;
+}
+.lab-reports-table {
+  overflow-x: auto;
+}
+.lab-reports-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.lab-reports-table th,
+.lab-reports-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+.lab-reports-table th {
+  background: #f7fafc;
+  font-weight: 600;
+  color: #4a5568;
+}
+.status {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+.status.completed {
+  background: #c6f6d5;
+  color: #22543d;
+}
+.status.pending {
+  background: #fed7d7;
+  color: #742a2a;
+}
+.status.in-progress {
+  background: #fef5e7;
+  color: #744210;
+}
+.view-btn {
+  background: #3182ce;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background 0.2s;
+}
+.view-btn:hover {
+  background: #2c5aa0;
+} 
