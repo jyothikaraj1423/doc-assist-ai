@@ -57,6 +57,19 @@ export default function PatientPortal({ userRole, patientInfo, setPatientInfo, p
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   
+  // Chatbot State
+  const [chatbotMessages, setChatbotMessages] = useState([
+    {
+      id: 1,
+      type: 'bot',
+      content: 'Hello! I\'m your AI health assistant. I can help you with general health questions, medication information, appointment scheduling, and more. How can I help you today?',
+      timestamp: new Date().toLocaleTimeString()
+    }
+  ]);
+  const [chatbotInput, setChatbotInput] = useState('');
+  const [isChatbotOpen, setIsChatbotOpen] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  
   // Get current patient name and doctor name
   const currentPatientName = patientInfo?.name || formInfo.name || username || 'Unknown Patient';
   const doctorName = doctorUsername ? `Dr. ${doctorUsername}` : 'Dr. manasaa';
@@ -547,6 +560,83 @@ export default function PatientPortal({ userRole, patientInfo, setPatientInfo, p
     setEditMode(true);
   };
 
+  // Chatbot Functions
+  const handleChatbotSubmit = async (e) => {
+    e.preventDefault();
+    if (!chatbotInput.trim()) return;
+
+    const userMessage = {
+      id: Date.now(),
+      type: 'user',
+      content: chatbotInput,
+      timestamp: new Date().toLocaleTimeString()
+    };
+
+    setChatbotMessages(prev => [...prev, userMessage]);
+    setChatbotInput('');
+    setIsTyping(true);
+
+    // Simulate AI response with typing delay
+    setTimeout(() => {
+      const botResponse = generateBotResponse(chatbotInput);
+      setChatbotMessages(prev => [...prev, {
+        id: Date.now() + 1,
+        type: 'bot',
+        content: botResponse,
+        timestamp: new Date().toLocaleTimeString()
+      }]);
+      setIsTyping(false);
+    }, 1000 + Math.random() * 2000); // Random delay between 1-3 seconds
+  };
+
+  const generateBotResponse = (userInput) => {
+    const input = userInput.toLowerCase();
+    
+    // Health-related responses
+    if (input.includes('pain') || input.includes('hurt') || input.includes('ache')) {
+      return "I understand you're experiencing pain. While I can provide general information, it's important to consult with your doctor for proper diagnosis. Can you tell me more about the location and intensity of your pain?";
+    }
+    
+    if (input.includes('medication') || input.includes('medicine') || input.includes('pill')) {
+      return "I can help with general medication information, but always consult your doctor or pharmacist for specific advice. What would you like to know about your medications?";
+    }
+    
+    if (input.includes('appointment') || input.includes('schedule') || input.includes('visit')) {
+      return "I can help you understand the appointment process. You can use the 'Start Health Assessment' feature to schedule an appointment, or contact your doctor directly through the Messages section.";
+    }
+    
+    if (input.includes('symptom') || input.includes('fever') || input.includes('cough')) {
+      return "I can help you track symptoms, but remember I'm not a replacement for professional medical advice. For concerning symptoms, please contact your doctor immediately.";
+    }
+    
+    if (input.includes('blood pressure') || input.includes('heart rate') || input.includes('vital')) {
+      return "You can track your vital signs in the Health Tracker section. Normal blood pressure is typically below 120/80 mmHg. Would you like me to explain what your readings mean?";
+    }
+    
+    if (input.includes('diet') || input.includes('nutrition') || input.includes('food')) {
+      return "Good nutrition is important for health! I can provide general dietary advice, but for personalized recommendations, consider consulting a registered dietitian or your doctor.";
+    }
+    
+    if (input.includes('exercise') || input.includes('workout') || input.includes('fitness')) {
+      return "Regular exercise is great for health! The American Heart Association recommends at least 150 minutes of moderate exercise per week. What type of exercise interests you?";
+    }
+    
+    if (input.includes('hello') || input.includes('hi') || input.includes('hey')) {
+      return "Hello! I'm here to help with your health questions. How can I assist you today?";
+    }
+    
+    if (input.includes('thank')) {
+      return "You're welcome! Is there anything else I can help you with?";
+    }
+    
+    // Default response
+    return "I'm here to help with general health information and guidance. For specific medical advice, please consult your doctor. What would you like to know more about?";
+  };
+
+  const toggleChatbot = () => {
+    setIsChatbotOpen(!isChatbotOpen);
+  };
+
   // Show form if not submitted or in edit mode
   if (!submitted || editMode) {
     return (
@@ -670,6 +760,14 @@ export default function PatientPortal({ userRole, patientInfo, setPatientInfo, p
   // Show enhanced dashboard
   return (
     <div className="patient-portal-container">
+      {/* Floating Chatbot Button */}
+      {!isChatbotOpen && (
+        <div className="floating-chatbot-btn" onClick={toggleChatbot}>
+          <span className="chatbot-icon">🤖</span>
+          <span className="chatbot-tooltip">AI Health Assistant</span>
+        </div>
+      )}
+      
       <div className="patient-portal-content">
         <div className="portal-header">
           <h2>👤 Enhanced Patient Portal</h2>
@@ -707,6 +805,9 @@ export default function PatientPortal({ userRole, patientInfo, setPatientInfo, p
                   <button onClick={() => setActiveTab('medications')}>Manage Medications</button>
                   <button onClick={() => setActiveTab('messages')}>Send Message</button>
                   <button onClick={() => setActiveTab('tracker')}>Log Health Data</button>
+                  <button onClick={toggleChatbot} className="chatbot-btn">
+                    🤖 AI Health Assistant
+                  </button>
                 </div>
               </div>
 
@@ -735,6 +836,49 @@ export default function PatientPortal({ userRole, patientInfo, setPatientInfo, p
                   </div>
                 </div>
               </div>
+
+                            {/* AI Health Assistant Chatbot */}
+              {isChatbotOpen && (
+                <>
+                  <div className="chatbot-backdrop" onClick={toggleChatbot}></div>
+                  <div className="chatbot-container open">
+                  <div className="chatbot-header">
+                    <h3>🤖 AI Health Assistant</h3>
+                    <button onClick={toggleChatbot} className="close-btn">×</button>
+                  </div>
+                  <div className="chatbot-messages">
+                    {chatbotMessages.map((message) => (
+                      <div key={message.id} className={`chatbot-message ${message.type}`}>
+                        <div className="message-content">{message.content}</div>
+                        <div className="message-timestamp">{message.timestamp}</div>
+                      </div>
+                    ))}
+                    {isTyping && (
+                      <div className="chatbot-message bot typing">
+                        <div className="typing-indicator">
+                          <span></span>
+                          <span></span>
+                          <span></span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <form onSubmit={handleChatbotSubmit} className="chatbot-input-form">
+                    <input
+                      type="text"
+                      value={chatbotInput}
+                      onChange={(e) => setChatbotInput(e.target.value)}
+                      placeholder="Type your message here..."
+                      className="chatbot-input"
+                      style={{display: 'block', visibility: 'visible'}}
+                    />
+                    <button type="submit" className="chatbot-send-btn" disabled={!chatbotInput.trim()}>
+                      Send
+                    </button>
+                  </form>
+                </div>
+                  </>
+              )}
             </div>
           )}
 
